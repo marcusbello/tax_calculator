@@ -1,0 +1,21 @@
+{{ define "tax.html" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tax #{{ .ID }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="">
+    <div>
+        <h1>Tax #{{ .ID }}</h1>
+        <p>Annual Income: ₦{{ .AnnualIncome }}</p>
+        <p>Investments: ₦{{ .Investments }}</p>
+        <p>Rent: ₦{{ .Rent }}</p>
+        <p>Tax Amount: ₦{{ .TaxAmount }}</p>
+
+        <a href="/">Back to Form</a>
+    </div>
+</body>
+</html>
+{{ end }}

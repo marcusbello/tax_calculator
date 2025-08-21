@@ -1,0 +1,36 @@
+body {
+    background-color: #f8f9fa;
+}
+
+/* currency input */
+.currency-input {
+    position: relative;
+    max-width: 280px;
+}
+
+.currency-input::before {
+    content: attr(data-symbol);
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.75;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.currency-input>input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px 10px 34px;
+    /* leave room for symbol */
+    border: 1px solid #cfd4dc;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+}
+
+.currency-input>input:focus {
+    border-color: #7aa2ff;
+    box-shadow: 0 0 0 3px rgba(122, 162, 255, .15);
+}

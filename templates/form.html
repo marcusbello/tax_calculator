@@ -1,0 +1,100 @@
+{{ define "form.html" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tax Calculator - 2025 NTA Tax Calculator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="">
+    <div class="">
+        <div>
+            <h1>Tax Calculator</h1>
+        </div>
+        <div>
+            <h2>Personal Income Tax Calculator</h2>
+            <p>Calculate your personal income tax based on your annual income, investments, and rent based on the 2025 NTA tax guidelines.</p>
+        </div>
+        <form method="POST" action="/tax-calculator" class="">
+
+            <div class="">
+                <div class="">
+                    <p>Total Annual Income</p>
+                    <label class="currency-input" data-symbol="₦" for="annualIncome">
+                        <input id="amount" name="amount_display" inputmode="decimal" autocomplete="off" required placeholder="0" />
+                    </label>
+                    <input type="hidden" id="annualIncome" name="annualIncome" required />
+                </div>
+            </div>
+
+           
+
+            <div class="">
+                <div class="">
+                    <label class="currency-input" data-symbol="₦" for="rentAmount">Rent Amount (₦)</label>
+                    <input type="text" id="rentAmount" name="rentAmount" placeholder="1300000" required>
+                </div>
+                <div class="">
+                    <label class="currency-input" data-symbol="₦" for="businessExpense">Investments / Seeds (₦)</label>
+                    <input type="text" id="businessExpense" name="businessExpense" placeholder="0" required>
+                </div>
+            </div>
+
+            <button type="submit">Calculate Tax</button>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            const input = document.getElementById('amount');
+            const hidden = document.getElementById('annualIncome');
+            const maxDecimals = 2; // set to 0 if you want whole numbers only
+
+            function formatWithCommas(value) {
+            // keep only digits and a single dot
+            value = value.replace(/[^\d.]/g, '');
+            const parts = value.split('.');
+            let intPart = parts[0].replace(/^0+(?=\d)/, ''); // strip leading zeros (but keep single 0)
+            if (intPart === '') intPart = '0';
+            // group thousands
+            intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            // decimals
+            let decPart = parts[1] ? parts[1].slice(0, maxDecimals) : '';
+            return decPart ? intPart + '.' + decPart : intPart;
+            }
+
+            function rawNumber(value) {
+            // remove commas; keep up to one dot
+            const cleaned = value.replace(/,/g, '');
+            return cleaned;
+            }
+
+            input.addEventListener('input', function (e) {
+            const formatted = formatWithCommas(e.target.value);
+            // set value and move caret to end (simple + stable)
+            e.target.value = formatted;
+            const end = e.target.value.length;
+            e.target.setSelectionRange(end, end);
+            if (hidden) hidden.value = rawNumber(formatted);
+            });
+
+            input.addEventListener('blur', function (e) {
+            // optionally pad to 2 decimals on blur:
+            const v = rawNumber(e.target.value);
+            if (!v) return;
+            if (maxDecimals > 0) {
+                const n = Number(v);
+                if (!isNaN(n)) {
+                const fixed = n.toFixed(maxDecimals);
+                e.target.value = formatWithCommas(fixed);
+                if (hidden) hidden.value = fixed;
+                }
+            } else {
+                if (hidden) hidden.value = rawNumber(e.target.value);
+            }
+            });
+        })();
+    </script>
+</body>
+</html>
+{{ end }}
