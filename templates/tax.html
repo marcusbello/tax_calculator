@@ -6,15 +6,24 @@
     <title>Tax #{{ .ID }}</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="">
-    <div>
-        <h1>Tax #{{ .ID }}</h1>
-        <p>Annual Income: ₦{{ .AnnualIncome }}</p>
-        <p>Investments: ₦{{ .Investments }}</p>
-        <p>Rent: ₦{{ .Rent }}</p>
-        <p>Tax Amount: ₦{{ .TaxAmount }}</p>
-
-        <a href="/">Back to Form</a>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tax Calculator Result</h1>
+        </div>
+        <div class="subheader">
+            <h2>Tax Calculation Details</h2>
+            <p>Here are the details of your tax calculation based on the inputs provided.</p>
+        </div>
+        <div class="result">
+            <p><strong>Annual Income:</strong> ₦{{ .AnnualIncome }}</p>
+            <p><strong>Rent:</strong> ₦{{ .Rent }}</p>
+            <p><strong>Deductions:</strong> ₦{{ .Investments }}</p>
+            <p><strong>Tax Amount:</strong> ₦{{ .TaxAmount }}</p>
+        </div>
+        <div class="actions">
+            <a href="/" class="back-link">Back to Calculator</a>
+        </div>
     </div>
 </body>
 </html>

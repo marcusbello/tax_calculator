@@ -7,47 +7,56 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="">
-    <div class="">
-        <div>
+    <div class="container">
+        <div class="header">
             <h1>Tax Calculator</h1>
         </div>
-        <div>
+        <div class="subheader">
             <h2>Personal Income Tax Calculator</h2>
-            <p>Calculate your personal income tax based on your annual income, investments, and rent based on the 2025 NTA tax guidelines.</p>
+            <p>Calculate your personal income tax based on your annual income, rent, and deductions using the 2025 NTAA guidelines.</p>
         </div>
-        <form method="POST" action="/tax-calculator" class="">
-
-            <div class="">
-                <div class="">
-                    <p>Total Annual Income</p>
-                    <label class="currency-input" data-symbol="₦" for="annualIncome">
-                        <input id="amount" name="amount_display" inputmode="decimal" autocomplete="off" required placeholder="0" />
-                    </label>
-                    <input type="hidden" id="annualIncome" name="annualIncome" required />
-                </div>
+        <form method="POST" action="/tax-calculator" class="form-group">
+            <div class="form-item">
+                <p>Total Annual Income</p>
+                <label class="currency-input" data-symbol="₦" for="annualIncome">
+                    <input id="amount" name="amount_display" inputmode="decimal" autocomplete="off" required placeholder="7,200,000" />
+                </label>
+                <input type="hidden" id="annualIncome" name="annualIncome" required />
             </div>
-
-           
-
-            <div class="">
-                <div class="">
-                    <label class="currency-input" data-symbol="₦" for="rentAmount">Rent Amount (₦)</label>
-                    <input type="text" id="rentAmount" name="rentAmount" placeholder="1300000" required>
-                </div>
-                <div class="">
-                    <label class="currency-input" data-symbol="₦" for="businessExpense">Investments / Seeds (₦)</label>
-                    <input type="text" id="businessExpense" name="businessExpense" placeholder="0" required>
-                </div>
+            <div class="form-item">
+                <p>Rent</p>
+                <label class="currency-input" data-symbol="₦" for="rentAmount">
+                    <input id="rentAmountInput" name="amount_display" inputmode="decimal" autocomplete="off" placeholder="0" />
+                </label>
+                <input type="hidden" id="rentAmount" name="rentAmount" required />
             </div>
-
-            <button type="submit">Calculate Tax</button>
+            <div class="form-item">
+                <p>Deductions</p>
+                <label class="currency-input" data-symbol="₦" for="businessExpense">
+                    <input id="businessExpenseInput" name="amount_display" inputmode="decimal" autocomplete="off" placeholder="0" />
+                </label>
+                <input type="hidden" id="businessExpense" name="businessExpense" required>
+            </div>
+            <br/>
+            <p>Note: The calculator uses the 2025 NTAA guidelines. Ensure your inputs are accurate for the best results.</p>
+            <p>For more information, Read the <a href="https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf" target="_blank">Nigeria Tax Act 2025</a>.</p>
+            <div class="form-actions">
+                <button type="reset" class="form-reset">Reset</button>
+                <button type="submit" class="form-submit">Calculate Tax</button>
+            </div>
         </form>
     </div>
 
     <script>
         (function () {
-            const input = document.getElementById('amount');
-            const hidden = document.getElementById('annualIncome');
+            // amount input and hidden field for raw value
+            const amountInput = document.getElementById('amount');
+            const amountHidden = document.getElementById('annualIncome');
+            // rent and business expense inputs
+            const rentInput = document.getElementById('rentAmountInput');
+            const rentHidden = document.getElementById('rentAmount');
+            const businessExpenseInput = document.getElementById('businessExpenseInput');
+            const businessExpenseHidden = document.getElementById('businessExpense');
             const maxDecimals = 2; // set to 0 if you want whole numbers only
 
             function formatWithCommas(value) {
@@ -69,16 +78,16 @@
             return cleaned;
             }
 
-            input.addEventListener('input', function (e) {
+            amountInput.addEventListener('input', function (e) {
             const formatted = formatWithCommas(e.target.value);
             // set value and move caret to end (simple + stable)
             e.target.value = formatted;
             const end = e.target.value.length;
             e.target.setSelectionRange(end, end);
-            if (hidden) hidden.value = rawNumber(formatted);
+            if (amountHidden) amountHidden.value = rawNumber(formatted);
             });
 
-            input.addEventListener('blur', function (e) {
+            amountInput.addEventListener('blur', function (e) {
             // optionally pad to 2 decimals on blur:
             const v = rawNumber(e.target.value);
             if (!v) return;
@@ -87,10 +96,60 @@
                 if (!isNaN(n)) {
                 const fixed = n.toFixed(maxDecimals);
                 e.target.value = formatWithCommas(fixed);
-                if (hidden) hidden.value = fixed;
+                if (amountHidden) amountHidden.value = fixed;
                 }
             } else {
-                if (hidden) hidden.value = rawNumber(e.target.value);
+                if (amountHidden) amountHidden.value = rawNumber(e.target.value);
+            }
+            });
+
+            rentInput.addEventListener('input', function (e) {
+            const formatted = formatWithCommas(e.target.value);
+            // set value and move caret to end (simple + stable)
+            e.target.value = formatted;
+            const end = e.target.value.length;
+            e.target.setSelectionRange(end, end);
+            if (rentHidden) rentHidden.value = rawNumber(formatted);
+            });
+
+            rentInput.addEventListener('blur', function (e) {
+            // optionally pad to 2 decimals on blur:
+            const v = rawNumber(e.target.value);
+            if (!v) return;
+            if (maxDecimals > 0) {
+                const n = Number(v);
+                if (!isNaN(n)) {
+                const fixed = n.toFixed(maxDecimals);
+                e.target.value = formatWithCommas(fixed);
+                if (rentHidden) rentHidden.value = fixed;
+                }
+            } else {
+                if (rentHidden) rentHidden.value = rawNumber(e.target.value);
+            }
+            });
+
+            businessExpenseInput.addEventListener('input', function (e) {
+            const formatted = formatWithCommas(e.target.value);
+            // set value and move caret to end (simple + stable)
+            e.target.value = formatted;
+            const end = e.target.value.length;
+            e.target.setSelectionRange(end, end);
+            if (businessExpenseHidden) businessExpenseHidden.value = rawNumber(formatted);
+            });
+
+            businessExpenseInput.addEventListener('blur', function (e) {
+            // optionally pad to 2 decimals on blur:
+            const v = rawNumber(e.target.value);
+            if (!v) return;
+            if (maxDecimals > 0) {
+                const n = Number(v);
+                if (!isNaN(n)) {
+                const fixed = n.toFixed(maxDecimals);
+                e.target.value = formatWithCommas(fixed);
+                if (businessExpenseHidden) businessExpenseHidden.value = fixed;
+                }
+            } else {
+                if (businessExpenseHidden) businessExpenseHidden.value = rawNumber(e.target.value);
             }
             });
         })();

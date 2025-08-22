@@ -36,19 +36,11 @@ func main() {
     http.HandleFunc("/", formHandler)
     http.HandleFunc("/tax-calculator", calculateTaxHandler)
     http.HandleFunc("/tax/", func(w http.ResponseWriter, r *http.Request) {
-        path := r.URL.Path
-        switch {
-        case strings.HasSuffix(path, "/send"):
-            sendHandler(w, r)
-        case strings.HasSuffix(path, "/paid"):
-            paidHandler(w, r)
-        default:
-            taxHandler(w, r)
-        }
+       	taxHandler(w, r)
     })
 
-    logger.Println("Server running on :8080")
-    logger.Fatal(http.ListenAndServe(":8080", nil))
+    logger.Println("Server running on :8000")
+    logger.Fatal(http.ListenAndServe(":8000", nil))
 }
 
 func formHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,37 +92,6 @@ func taxHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     templates.ExecuteTemplate(w, "tax.html", data)
-}
-
-func sendHandler(w http.ResponseWriter, r *http.Request) {
-    id := strings.TrimPrefix(r.URL.Path, "/tax/")
-    id = strings.TrimSuffix(id, "/send")
-
-    mu.Lock()
-    data, ok := store[id]
-    if ok {
-        // data.Status = "Sent"
-        store[id] = data
-    }
-    mu.Unlock()
-
-    http.Redirect(w, r, "/tax/"+id, http.StatusSeeOther)
-}
-
-func paidHandler(w http.ResponseWriter, r *http.Request) {
-    id := strings.TrimPrefix(r.URL.Path, "/tax/")
-    id = strings.TrimSuffix(id, "/paid")
-
-    mu.Lock()
-    data, ok := store[id]
-    if ok {
-        // data.Status = "Paid"
-        // data.PaidDate = time.Now().Format("Jan 2, 2006")
-        store[id] = data
-    }
-    mu.Unlock()
-
-    http.Redirect(w, r, "/invoice/"+id, http.StatusSeeOther)
 }
 
 func parseOrZero(s string) uint64 {
@@ -211,6 +172,9 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	}
 	// If there is any remaining annual income, apply the last rate
 	if annualIncome > 0 {
+		if lastRate == 0 {
+			lastRate =  rates[0].Payment // Default to the first rate if no last rate is set
+		}
 		taxAmount += lastRate
 		logger.Printf("Applying last rate: %v; taxAmount: %d", lastRate, taxAmount)
 	}
