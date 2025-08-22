@@ -1,5 +1,5 @@
 # ----------- Build Stage -----------
-FROM golang:1.22-alpine AS builder
+FROM golang:1.24.1-alpine AS builder
 
 # Enable Go modules and ensure no CGO (for a static binary)
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
