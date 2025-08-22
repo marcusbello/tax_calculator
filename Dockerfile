@@ -31,7 +31,7 @@ COPY static ./static
 COPY templates ./templates
 
 # Expose port
-EXPOSE 8080
+EXPOSE 10000
 
 # Run app
 CMD ["./server"]

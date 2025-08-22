@@ -48,12 +48,12 @@ func main() {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	server := &http.Server{
-		Addr:    "127.0.0.1:8080",
+		Addr:    "0.0.0.0:10000",
 		Handler: mux,
 	}
 
 	go func() {
-		logger.Println("Server running on :8080")
+		logger.Println("Server running on :10000")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatalf("Server error: %v", err)
 		}
