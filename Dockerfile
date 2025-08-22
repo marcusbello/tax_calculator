@@ -7,7 +7,7 @@ ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 WORKDIR /app
 
 # Cache dependencies
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN go mod download
 
 # Copy source
