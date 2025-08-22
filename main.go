@@ -155,6 +155,10 @@ func percentageOf(percent, amount int64) uint64 {
 func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64, error) {
 	logger.Printf("annualEarning: %s; rentAmount: %s; businessExpenses: %s;", annualEarnings, rentAmount, businessExpenses)
 	annualIncome := parseOrZero(annualEarnings)
+	// check if rent is higher than income
+	if rent := parseOrZero(rentAmount); rent > annualIncome {
+		return 0, fmt.Errorf("rent amount %d cannot be greater than annual income %d", rent, annualIncome)
+	}
 	// base case if annual income is less than 800k
 	baseValue := uint64(800_000)
 	if annualIncome < baseValue {
