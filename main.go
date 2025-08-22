@@ -1,15 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -32,15 +35,48 @@ var (
 func main() {
     rand.Seed(time.Now().UnixNano())
 
-    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-    http.HandleFunc("/", formHandler)
-    http.HandleFunc("/tax-calculator", calculateTaxHandler)
-    http.HandleFunc("/tax/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+
+    mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+    mux.HandleFunc("/", formHandler)
+    mux.HandleFunc("/tax-calculator", calculateTaxHandler)
+    mux.HandleFunc("/tax/", func(w http.ResponseWriter, r *http.Request) {
        	taxHandler(w, r)
     })
+	// Setting up signal handling
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
-    logger.Println("Server running on :8000")
-    logger.Fatal(http.ListenAndServe(":8000", nil))
+	server := &http.Server{
+		Addr:    "127.0.0.1:8080",
+		Handler: mux,
+	}
+
+	go func() {
+		logger.Println("Server running on :8080")
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Fatalf("Server error: %v", err)
+		}
+	}()
+
+	for {
+		sig := <-signalChan
+		switch sig {
+		case syscall.SIGHUP:
+			logger.Println("Received SIGHUP (reload requested)")
+		case syscall.SIGINT, syscall.SIGTERM:
+			logger.Printf("Received %s — shutting down...", sig)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := server.Shutdown(ctx); err != nil {
+				logger.Fatalf("Graceful shutdown failed: %v", err)
+			}
+			logger.Println("Server stopped cleanly.")
+			return
+		default:
+			logger.Printf("Unhandled signal: %v", sig)
+		}
+	}
 }
 
 func formHandler(w http.ResponseWriter, r *http.Request) {

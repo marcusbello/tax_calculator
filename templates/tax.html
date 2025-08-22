@@ -12,19 +12,63 @@
             <h1>Tax Calculator Result</h1>
         </div>
         <div class="subheader">
-            <h2>Tax Calculation Details</h2>
+            <h2>Personal Income Tax Details</h2>
             <p>Here are the details of your tax calculation based on the inputs provided.</p>
         </div>
         <div class="result">
-            <p><strong>Annual Income:</strong> ₦{{ .AnnualIncome }}</p>
-            <p><strong>Rent:</strong> ₦{{ .Rent }}</p>
-            <p><strong>Deductions:</strong> ₦{{ .Investments }}</p>
-            <p><strong>Tax Amount:</strong> ₦{{ .TaxAmount }}</p>
+            <div class="result-row">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 3v18m9-9H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="label">Annual Income:</span>
+                <span class="value">₦{{ .AnnualIncome }}</span>
+            </div>
+            <div class="result-row">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 7h18M3 12h18M3 17h18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="label">Rent:</span>
+                <span class="value">₦{{ .Rent }}</span>
+            </div>
+            <div class="result-row">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                <path d="M8 12h8M12 8v8" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span class="label">Deductions:</span>
+                <span class="value">₦{{ .Investments }}</span>
+            </div>
+            <div class="result-row highlight">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 8c-1.5 0-2.5.5-3 1.5-.5 1 .5 2 2 2h2c1.5 0 2.5.5 2 1.5-.5 1-1.5 1.5-3 1.5m0-8v12" 
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="label">Tax Amount:</span>
+                <span class="value">₦{{ .TaxAmount }}</span>
+            </div>
         </div>
+
         <div class="actions">
             <a href="/" class="back-link">Back to Calculator</a>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".result .value").forEach(el => {
+            // strip ₦ and commas, then parse
+            let raw = el.textContent.replace(/[₦,]/g, "").trim();
+            if (!raw || isNaN(raw)) return;
+
+            let formatted = Number(raw).toLocaleString("en-NG", {
+                style: "currency",
+                currency: "NGN",
+                minimumFractionDigits: 0
+            });
+
+            el.textContent = formatted;
+            });
+        });
+    </script>
 </body>
 </html>
 {{ end }}
