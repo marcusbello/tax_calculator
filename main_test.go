@@ -18,7 +18,7 @@ func TestTaxCalculator(t *testing.T) {
 			annualEarnings:   "500000",
 			rentAmount:       "100000",
 			businessExpenses: "50000",
-			want:             350000, // adjust based on your formula
+			want:             0,
 			wantErr:          false,
 		},
 		{

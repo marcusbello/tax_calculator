@@ -97,7 +97,7 @@ func calculateTaxHandler(w http.ResponseWriter, r *http.Request) {
 
 	taxAmount, err := taxCalculator(annualEarning, rentAmount, businessExpense)
 	if err != nil {
-		logger.Print("taxCalculator: ", err)
+		logger.Print("taxCalculator error: ", err)
 		return
 	}
 	logger.Printf("Tax amount calculated: %d", taxAmount)
