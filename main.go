@@ -48,12 +48,12 @@ func main() {
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	server := &http.Server{
-		Addr:    "0.0.0.0:10000",
+		Addr:    "0.0.0.0:10001",
 		Handler: mux,
 	}
 
 	go func() {
-		logger.Println("Server running on :10000")
+		logger.Println("Server running on :10001")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatalf("Server error: %v", err)
 		}
@@ -163,42 +163,45 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	baseValue := uint64(800_000)
 	if annualIncome < baseValue {
 		return 0, nil
+	} else {
+		annualIncome -= baseValue
 	}
 	// Rate is the tax brackets
 	type Rate struct {
 		Amount uint64
-		Percentage string
+		Percentage uint32
 		Payment uint64 // This feild  is for storing the payment amount i.e 15% of 2,200,000
 	}
 	rates := [5]Rate{
 		{
 			Amount: 2_200_000,
-			Percentage: "15%",
+			Percentage: 15,
 			Payment: percentageOf(15, 2_200_000),
 		},
 		{
 			Amount: 9_000_000,
-			Percentage: "18%",
+			Percentage: 18,
 			Payment: percentageOf(18, 9_000_000),
 		},
 		{
 			Amount: 13_000_000,
-			Percentage: "21%",
+			Percentage: 21,
 			Payment: percentageOf(21, 13_000_000),
 		},
 		{
 			Amount: 25_000_000,
-			Percentage: "23%",
+			Percentage: 23,
 			Payment: percentageOf(23, 25_000_000),
 		},
 		{
 			Amount: 50_000_000,
-			Percentage: "25%",
+			Percentage: 25,
 			Payment: percentageOf(25, 50_000_000),
 		},
 	}
 	// const
 	var taxAmount uint64
+	var lastPercentage uint32
 	var lastRate uint64
 	// rate calculator
 	for i, rate := range rates {
@@ -206,17 +209,18 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 			taxAmount += rate.Payment
 			annualIncome -= rate.Amount
 			if i+1 < len(rates) {
-				lastRate = rates[i+1].Payment
+				lastPercentage = rates[i+1].Percentage
 			}
 		}
 	}
 	// If there is any remaining annual income, apply the last rate
 	if annualIncome > 0 {
-		if lastRate == 0 {
-			lastRate =  rates[0].Payment // Default to the first rate if no last rate is set
+		if lastPercentage != 0 {
+			lastRate = percentageOf(int64(lastPercentage), int64(annualIncome))
+			logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
 		}
 		taxAmount += lastRate
-		logger.Printf("Applying last rate: %v; taxAmount: %d", lastRate, taxAmount)
+		logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
 	}
 	// rent and investments
 	rent := parseOrZero(rentAmount)

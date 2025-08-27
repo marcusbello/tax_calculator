@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Calculator - 2025 NTA Tax Calculator</title>
+    <title>PIT Calculator - Nigeria 2025 NTA Personal Income Tax Calculator</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
         </div>
         <div class="subheader">
             <h2>Personal Income Tax Calculator</h2>
-            <p>Calculate your personal income tax based on your annual income, rent, and deductions using the 2025 NTAA guidelines.</p>
+            <p>Calculate your personal income tax based on your annual income, annual rent, and deductions using the 2025 NTA tax bands.</p>
         </div>
         <form method="POST" action="/tax-calculator" class="form-group">
             <div class="form-item">
@@ -39,8 +39,8 @@
                 <input type="hidden" id="businessExpense" name="businessExpense" required>
             </div>
             <br/>
-            <p>Note: The calculator uses the 2025 NTAA guidelines. Ensure your inputs are accurate for the best results.</p>
-            <p>For more information, Read the <a href="https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf" target="_blank">Nigeria Tax Act 2025</a> Section 58.</p>
+            <p>Note: The calculator uses the 2025 NTA guidelines. Ensure your inputs are accurate for the best results.</p>
+            <p>For more information, Read the <a href="https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf" target="_blank">Nigeria Tax Act 2025</a>.</p>
             <div class="form-actions">
                 <button type="reset" class="form-reset">Reset</button>
                 <button type="submit" class="form-submit">Calculate Tax</button>
@@ -58,7 +58,7 @@
             const rentHidden = document.getElementById('rentAmount');
             const businessExpenseInput = document.getElementById('businessExpenseInput');
             const businessExpenseHidden = document.getElementById('businessExpense');
-            const maxDecimals = 2; // set to 0 if you want whole numbers only
+            const maxDecimals = 0; // set to 0 if you want whole numbers only
 
             function formatWithCommas(value) {
             // keep only digits and a single dot
