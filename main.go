@@ -161,11 +161,11 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	}
 	// base case if annual income is less than 800k
 	baseValue := uint64(800_000)
-	if annualIncome < baseValue {
+	if annualIncome <= baseValue {
 		return 0, nil
-	} else {
-		annualIncome -= baseValue
 	}
+	annualIncome = annualIncome - baseValue
+	logger.Printf("annualIncome after base deduction: %d", annualIncome)
 	// Rate is the tax brackets
 	type Rate struct {
 		Amount uint64
@@ -204,10 +204,13 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	var lastPercentage uint32
 	var lastRate uint64
 	// rate calculator
+	lastPercentage = rates[0].Percentage // default to first rate
+
 	for i, rate := range rates {
 		if annualIncome > rate.Amount {
 			taxAmount += rate.Payment
 			annualIncome -= rate.Amount
+			logger.Printf("taxAmount: %d; annualIncome: %d;", taxAmount, annualIncome)
 			if i+1 < len(rates) {
 				lastPercentage = rates[i+1].Percentage
 			}
@@ -215,12 +218,10 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	}
 	// If there is any remaining annual income, apply the last rate
 	if annualIncome > 0 {
-		if lastPercentage != 0 {
-			lastRate = percentageOf(int64(lastPercentage), int64(annualIncome))
-			logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
-		}
-		taxAmount += lastRate
-		logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
+    lastRate = percentageOf(int64(lastPercentage), int64(annualIncome))
+    logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
+    taxAmount += lastRate
+    logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
 	}
 	// rent and investments
 	rent := parseOrZero(rentAmount)
@@ -237,7 +238,11 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	}
 	// investment refund
 	if investments > 0 {
-		taxAmount -= investments
+		if taxAmount > investments {
+			taxAmount -= investments
+		} else {
+			taxAmount = 0
+		}
 	}
 
 	return taxAmount, nil
