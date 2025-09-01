@@ -184,6 +184,30 @@ body {
     font-size: 1.25rem;
     margin-top: 0.25rem;
 }
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+    /* gray-500 */
+    margin-top: 2rem;
+    font-family: "Poppins", "Segoe UI", Roboto, Arial, sans-serif;
+}
+.footer a {
+    color: #2563eb;
+    /* blue-600 */
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
+}
 
 /* 📱 Responsive adjustments */
 @media (max-width: 480px) {
