@@ -218,10 +218,10 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	}
 	// If there is any remaining annual income, apply the last rate
 	if annualIncome > 0 {
-    lastRate = percentageOf(int64(lastPercentage), int64(annualIncome))
-    logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
-    taxAmount += lastRate
-    logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
+		lastRate = percentageOf(int64(lastPercentage), int64(annualIncome))
+		logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
+		taxAmount += lastRate
+		logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
 	}
 	// rent and investments
 	rent := parseOrZero(rentAmount)
