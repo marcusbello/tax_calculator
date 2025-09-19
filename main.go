@@ -38,19 +38,27 @@ func main() {
 	mux := http.NewServeMux()
 
     mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
     mux.HandleFunc("/", formHandler)
     mux.HandleFunc("/tax-calculator", calculateTaxHandler)
+	mux.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "templates/about.html")
+	})
+	mux.HandleFunc("/privacy", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "templates/privacy.html")
+	})
     mux.HandleFunc("/tax/", func(w http.ResponseWriter, r *http.Request) {
        	taxHandler(w, r)
     })
-	// Setting up signal handling
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	server := &http.Server{
 		Addr:    "0.0.0.0:10000",
 		Handler: mux,
 	}
+
+	// Setting up signal handling
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	go func() {
 		logger.Println("Server running on :10000")
