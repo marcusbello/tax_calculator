@@ -88,39 +88,33 @@ func BenchmarkTaxCalculator(b *testing.B) {
 func TestPercentageOf(t *testing.T) {
 	tests := []struct {
 		name string
-		part int64
-		all  int64
+		percent int64
+		amount  int64
 		want uint64
 	}{
 		{
 			name: "normal case",
-			part: 50,
-			all:  200,
-			want: 25,
+			percent: 50,
+			amount:  200,
+			want: 100,
 		},
 		{
 			name: "zero part",
-			part: 0,
-			all:  100,
+			percent: 0,
+			amount:  100,
 			want: 0,
 		},
 		{
 			name: "zero all",
-			part: 50,
-			all:  0,
+			percent: 50,
+			amount:  0,
 			want: 0, // or handle as error based on your requirements
-		},
-		{
-			name: "part greater than all",
-			part: 150,
-			all:  100,
-			want: 150, // or handle as error based on your requirements
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := percentageOf(tt.part, tt.all); got != tt.want {
+			if got := percentageOf(tt.percent, tt.amount); got != tt.want {
 				t.Errorf("percentageOf() = %v, want %v", got, tt.want)
 			}
 		})

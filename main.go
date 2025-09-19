@@ -157,6 +157,12 @@ func parseOrZero(s string) uint64 {
 }
 
 func percentageOf(percent, amount int64) uint64 {
+	if percent <= 0 || percent > 100 {
+		return 0
+	}
+	if amount <= 0 {
+		return 0
+	}
 	return uint64((percent * amount) / 100)
 }
 
