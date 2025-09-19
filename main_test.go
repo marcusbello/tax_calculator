@@ -76,3 +76,53 @@ func TestTaxCalculator(t *testing.T) {
 		})
 	}
 }
+
+// run BenchmarkTaxCalculator to see performance
+func BenchmarkTaxCalculator(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, _ = taxCalculator("3200000", "1000000", "0")
+	}
+}
+
+
+func TestPercentageOf(t *testing.T) {
+	tests := []struct {
+		name string
+		part int64
+		all  int64
+		want uint64
+	}{
+		{
+			name: "normal case",
+			part: 50,
+			all:  200,
+			want: 25,
+		},
+		{
+			name: "zero part",
+			part: 0,
+			all:  100,
+			want: 0,
+		},
+		{
+			name: "zero all",
+			part: 50,
+			all:  0,
+			want: 0, // or handle as error based on your requirements
+		},
+		{
+			name: "part greater than all",
+			part: 150,
+			all:  100,
+			want: 150, // or handle as error based on your requirements
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := percentageOf(tt.part, tt.all); got != tt.want {
+				t.Errorf("percentageOf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
