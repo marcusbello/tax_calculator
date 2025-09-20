@@ -120,3 +120,9 @@ func TestPercentageOf(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkPercentageOf(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = percentageOf(50, 200)
+	}
+}
