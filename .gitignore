@@ -2,4 +2,6 @@ tmp
 /tmp
 .air.toml
 /.air.toml
+*.pprof
+*.test
 

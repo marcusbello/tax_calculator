@@ -11,3 +11,12 @@
     - 20% of rent deduction is capped at #500,000
 - 0 deduction for home owner
 - subtract business expenses, ask tax advisors
+
+
+#### For Dev
+
+
+##### Benchmarking
+Issues
+- 1. - ParseOrZero fn needs cleanup, either only accept the wanted values, optimize the function or make cleanup before the taxCalculator fn.
+- 2. - 

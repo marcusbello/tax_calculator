@@ -44,8 +44,8 @@ func main() {
 	mux.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "templates/about.html")
 	})
-	mux.HandleFunc("/privacy", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "templates/privacy.html")
+	mux.HandleFunc("/contact-us", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "templates/contact-us.html")
 	})
     mux.HandleFunc("/tax/", func(w http.ResponseWriter, r *http.Request) {
        	taxHandler(w, r)
@@ -167,7 +167,7 @@ func percentageOf(percent, amount int64) uint64 {
 }
 
 func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64, error) {
-	logger.Printf("annualEarning: %s; rentAmount: %s; businessExpenses: %s;", annualEarnings, rentAmount, businessExpenses)
+	// logger.Printf("annualEarning: %s; rentAmount: %s; businessExpenses: %s;", annualEarnings, rentAmount, businessExpenses)
 	annualIncome := parseOrZero(annualEarnings)
 	// check if rent is higher than income
 	if rent := parseOrZero(rentAmount); rent > annualIncome {
@@ -179,7 +179,7 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 		return 0, nil
 	}
 	annualIncome = annualIncome - baseValue
-	logger.Printf("annualIncome after base deduction: %d", annualIncome)
+	// logger.Printf("annualIncome after base deduction: %d", annualIncome)
 	// Rate is the tax brackets
 	type Rate struct {
 		Amount uint64
@@ -224,7 +224,7 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 		if annualIncome > rate.Amount {
 			taxAmount += rate.Payment
 			annualIncome -= rate.Amount
-			logger.Printf("taxAmount: %d; annualIncome: %d;", taxAmount, annualIncome)
+			// logger.Printf("taxAmount: %d; annualIncome: %d;", taxAmount, annualIncome)
 			if i+1 < len(rates) {
 				lastPercentage = rates[i+1].Percentage
 			}
@@ -233,9 +233,9 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	// If there is any remaining annual income, apply the last rate
 	if annualIncome > 0 {
 		lastRate = percentageOf(int64(lastPercentage), int64(annualIncome))
-		logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
+		// logger.Printf("Applied last percentage: %d%%; lastRate: %d; annualIncome: %d", lastPercentage, lastRate, annualIncome)
 		taxAmount += lastRate
-		logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
+		// logger.Printf("Applied last rate: %v; taxAmount: %d", lastRate, taxAmount)
 	}
 	// rent and investments
 	rent := parseOrZero(rentAmount)
@@ -243,7 +243,7 @@ func taxCalculator(annualEarnings, rentAmount, businessExpenses string) (uint64,
 	// rentRefund
 	if rent > 0 {
 		rentRefund := percentageOf(20, int64(rent))
-		logger.Printf("rentRefund: %d", rentRefund)
+		// logger.Printf("rentRefund: %d", rentRefund)
 		if rentRefund > 500_000 {
 			taxAmount -= 500_000
 		} else {
