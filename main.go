@@ -30,7 +30,7 @@ type TaxData struct {
 }
 
 var (
-	readRange = "A1:H10"
+	readRange = "A1:G10"
 	sheetName = "Sheet1"
     templates = template.Must(template.ParseGlob("templates/*.html"))
     store     = make(map[string]TaxData)
@@ -93,7 +93,7 @@ func main() {
 
 	// Set up Google Sheets API client
 	options := []option.ClientOption{
-		option.WithCredentialsFile("./config/config.json"),
+		option.WithCredentialsFile("./config.json"),
 		option.WithScopes(sheets.SpreadsheetsScope),
 	}
 
