@@ -93,7 +93,7 @@ func main() {
 
 	// Set up Google Sheets API client
 	options := []option.ClientOption{
-		option.WithCredentialsFile("./config.json"),
+		option.WithCredentialsFile("config.json"),
 		option.WithScopes(sheets.SpreadsheetsScope),
 	}
 
