@@ -30,6 +30,9 @@ COPY static ./static
 # Copy templates
 COPY templates ./templates
 
+# Copy config
+COPY config.json .
+
 # Expose port
 EXPOSE 10000
 
