@@ -14,6 +14,10 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/marcusbello/tax-calculator/pkg"
+	"google.golang.org/api/option"
+	"google.golang.org/api/sheets/v4"
 )
 
 // TaxData represents the data structure for storing tax information.
@@ -26,21 +30,88 @@ type TaxData struct {
 }
 
 var (
+	readRange = "A1:H10"
+	sheetName = "Sheet1"
     templates = template.Must(template.ParseGlob("templates/*.html"))
     store     = make(map[string]TaxData)
     mu        sync.Mutex
 	logger = log.New(os.Stdout, "tax-calculator: ", log.LstdFlags|log.Lshortfile)
 )
 
+type CalculatorHandler struct {
+	spreadsheet *pkg.Spreadsheet
+}
+
+func (h *CalculatorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	annualEarning := r.FormValue("annualIncome")
+	rentAmount := r.FormValue("rentAmount")
+	businessExpense := r.FormValue("businessExpense")
+
+    id := fmt.Sprintf("%d", rand.Intn(1000000))
+
+	taxAmount, err := taxCalculator(annualEarning, rentAmount, businessExpense)
+	if err != nil {
+		logger.Print("taxCalculator error: ", err)
+		return
+	}
+	logger.Printf("Tax amount calculated: %d", taxAmount)
+    data := TaxData{
+        ID:          id,
+		AnnualIncome: annualEarning,
+		Rent: rentAmount,
+		Investments: businessExpense,
+		TaxAmount: taxAmount,
+    }
+	// Calculate ETR and monthly tax
+	etr := fmt.Sprintf("%.2f%%", float64(taxAmount) / float64(parseOrZero(annualEarning)) * 100)
+	mTax := fmt.Sprintf("%.0f", float64(taxAmount) / 12)
+
+	// Store data in Google Sheets
+	if h.spreadsheet != nil {
+		_, err = h.spreadsheet.AppendSheet(sheetName, readRange, [][]interface{}{
+			{annualEarning, rentAmount, businessExpense, taxAmount, etr, mTax, time.Now().Format(time.RFC3339)},
+		})
+		if err != nil {
+			logger.Print("Error appending to Google Sheets: ", err)
+		}
+	}
+
+    mu.Lock()
+    store[id] = data
+    mu.Unlock()
+
+	http.Redirect(w, r, "/tax/"+id, http.StatusSeeOther)
+}
+
 func main() {
     rand.Seed(time.Now().UnixNano())
+
+	// Set up Google Sheets API client
+	options := []option.ClientOption{
+		option.WithCredentialsFile("./config/config.json"),
+		option.WithScopes(sheets.SpreadsheetsScope),
+	}
+
+	// setup spreadsheet (not used in current handlers)
+	sheetService, err := sheets.NewService(context.Background(), options...)
+	if err != nil {
+		logger.Fatal("Unable to retrieve Sheets client: ", err)
+	}
+	spreadsheetID := "11_M38Xl9iGgWhcL8WIIxi3gRJWC7j6997BuuobzNs90"
+	spreadsheet := pkg.NewSpreadsheet(sheetService, spreadsheetID)
 
 	mux := http.NewServeMux()
 
     mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
     mux.HandleFunc("/", formHandler)
-    mux.HandleFunc("/tax-calculator", calculateTaxHandler)
+    // mux.HandleFunc("/tax-calculator", calculateTaxHandler)
+	mux.Handle("POST /tax-calculator", &CalculatorHandler{spreadsheet: spreadsheet})
 	mux.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "templates/about.html")
 	})
@@ -89,39 +160,6 @@ func main() {
 
 func formHandler(w http.ResponseWriter, r *http.Request) {
     templates.ExecuteTemplate(w, "form.html", nil)
-}
-
-func calculateTaxHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method != http.MethodPost {
-        http.Redirect(w, r, "/", http.StatusSeeOther)
-        return
-    }
-
-    annualEarning := r.FormValue("annualIncome")
-	rentAmount := r.FormValue("rentAmount")
-	businessExpense := r.FormValue("businessExpense")
-
-    id := fmt.Sprintf("%d", rand.Intn(1000000))
-
-	taxAmount, err := taxCalculator(annualEarning, rentAmount, businessExpense)
-	if err != nil {
-		logger.Print("taxCalculator error: ", err)
-		return
-	}
-	logger.Printf("Tax amount calculated: %d", taxAmount)
-    data := TaxData{
-        ID:          id,
-		AnnualIncome: annualEarning,
-		Rent: rentAmount,
-		Investments: businessExpense,
-		TaxAmount: taxAmount,
-    }
-
-    mu.Lock()
-    store[id] = data
-    mu.Unlock()
-
-	http.Redirect(w, r, "/tax/"+id, http.StatusSeeOther)
 }
 
 func taxHandler(w http.ResponseWriter, r *http.Request) {
