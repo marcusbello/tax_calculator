@@ -5,4 +5,4 @@ tmp
 *.pprof
 *.test
 /config/config.json
-
+config.json
